@@ -39,6 +39,7 @@ Changelog = "https://github.com/novucs/metabase-sync/blob/main/CHANGELOG.md"
 
 [project.scripts]
 metabase-sync = "metabase_sync.cli:main"
+mbs = "metabase_sync.ext.cli:main"
 
 [build-system]
 requires = ["hatchling"]
