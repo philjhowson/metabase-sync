@@ -182,6 +182,18 @@ def test_unmanaged_archive_archives_items_the_files_never_had_but_not_subscripti
     assert plan.unmanaged == []
 
 
+def test_a_top_level_collection_cannot_take_another_top_level_collections_name():
+    index = remote(collection=[collection(1, "a"), collection(2, "b")])
+    index.top_names = {eid("a"): "coll a", eid("b"): "Coll B"}
+    local = local_from(index, [(COLLECTION, 1)], {eid("a")})
+
+    assert plan_for(index, local).empty
+    edit(local, "a", name="coll b")
+    with pytest.raises(ValidationFailed) as failed:
+        plan_for(index, local)
+    assert "already named 'coll b'" in str(failed.value.problems)
+
+
 def unmanaged_card_rewritten_as(index: Index, tag: str) -> LocalTree:
     local = local_from(index, [(COLLECTION, 1), (CARD, 10)], {eid("a")})
     local.entities[eid(tag)] = local.entities.pop(eid("c"))

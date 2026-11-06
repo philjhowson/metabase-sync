@@ -102,6 +102,9 @@ class Index:
     warnings: list[str] = field(default_factory=list)
     broken: list[str] = field(default_factory=list)
     snippets: bool = True
+    top_names: dict[str, str] = field(
+        default_factory=dict
+    )  # live top-level collections
     _by_eid: dict[str, tuple[str, int]] = field(
         default_factory=dict, init=False, repr=False
     )
@@ -272,6 +275,14 @@ def fetch_index(
         RemoteItem.model_validate(row, extra="ignore") for row in collections
     ]
     chains = manageable(summaries_of)
+    index.top_names = {
+        c.entity_id: c.name
+        for c in summaries_of
+        if c.entity_id
+        and not c.archived
+        and not location_ids(c.location)
+        and c.regular_collection
+    }
     root_ids = (
         {c.id for c in summaries_of if c.entity_id in roots}
         if roots is not None

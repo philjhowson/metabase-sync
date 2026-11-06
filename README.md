@@ -9,7 +9,7 @@ Based on [metabase-sync](https://github.com/novucs/metabase-sync) by [novucs](ht
 Install from a tag of this repo (Python 3.12+); the CLI is `mbs`, which is `metabase-sync` plus the commands below:
 
 ```bash
-uv add "sync-metabase @ git+https://github.com/philjhowson/sync-metabase@v1.1.0"
+uv add "sync-metabase @ git+https://github.com/philjhowson/sync-metabase@v1.2.0"
 ```
 
 ### Branch previews
@@ -37,6 +37,10 @@ unmanaged: archive   # default: keep
 ```
 
 For collections where git is the only way in (the Metabase UI is view-only): `plan` and `apply` also archive items in the managed collections that no file and no `metabase-sync.state` entry knows about, such as ones created in the UI. Subscriptions are never archived this way, since viewers create their own.
+
+### Unique top-level collection names
+
+Renaming a collection is editing its `name:`; items are matched by entity id. `plan` and `apply` refuse a top-level collection whose name (ignoring case) another top-level collection in Metabase already has, so a stakeholder-facing name can't collide with someone else's.
 
 ### SQL repo tags
 

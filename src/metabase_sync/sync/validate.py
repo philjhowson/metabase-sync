@@ -13,6 +13,7 @@ from metabase_sync.format.representations import (
     SUBSCRIPTION,
     collection_of,
 )
+from metabase_sync.format.representations.collection import Collection
 from metabase_sync.format.representations.dashboard import Dashboard
 from metabase_sync.metabase.references import DATABASE, FIELD, TABLE, walk
 from metabase_sync.metabase.remote import Remote
@@ -110,6 +111,19 @@ def remote_problems(
         *outside_scope(tree, remote, scope),
         *unmanaged_snippets(tree, remote),
         *removed_dashcard_filters(tree, remote),
+        *top_level_name_clashes(tree, remote),
+    ]
+
+
+def top_level_name_clashes(tree: LocalTree, remote: Remote) -> list[str]:
+    """A top-level collection in the files may not take the name of another one in Metabase."""
+    return [
+        f"{e.path}: another top-level collection in Metabase is already named "
+        f"{e.name!r} ({other}); rename one of them"
+        for e in tree.entities.values()
+        if isinstance(e.data, Collection) and e.data.parent_id is None
+        for other, name in remote.index.top_names.items()
+        if other != e.entity_id and name.casefold() == e.name.casefold()
     ]
 
 
