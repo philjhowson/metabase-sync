@@ -1,9 +1,59 @@
-# metabase-sync
+# sync-metabase
 
-[![PyPI](https://img.shields.io/pypi/v/metabase-sync.svg)](https://pypi.org/project/metabase-sync/)
-[![Python](https://img.shields.io/pypi/pyversions/metabase-sync.svg)](https://pypi.org/project/metabase-sync/)
-[![CI](https://github.com/novucs/metabase-sync/actions/workflows/ci.yml/badge.svg)](https://github.com/novucs/metabase-sync/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
+A fork of [metabase-sync](https://github.com/novucs/metabase-sync) by [novucs](https://github.com/novucs). Everything below "Upstream" is his tool and his documentation; this fork adds branch previews and SQL repo tags in `src/metabase_sync/ext/`, and leaves his code untouched.
+
+## Fork additions
+
+Install from a tag of this repo; the CLI is `mbs`, which is `metabase-sync` plus the commands below:
+
+```bash
+uv tool install "git+https://github.com/philjhowson/sync-metabase@v0.4.0-ext.1"
+```
+
+### Branch previews
+
+A draft copy of the managed collection inside one user's personal collection, so only that user and Metabase admins can see it. Stakeholders never see unreviewed dashboards; the real collection changes only through `apply`.
+
+```bash
+mbs preview apply   --owner alice@example.com --name "🚧 sales @ my-branch"   # files -> preview
+mbs preview export  --owner alice@example.com --name "🚧 sales @ my-branch"   # preview -> files
+mbs preview destroy --name "🚧 sales @ my-branch"                             # archive it (every owner's)
+```
+
+- Needs exactly one collection under `collections:` in `metabase-sync.yaml`.
+- Previewing again updates the same items; items removed from the files are archived in the preview.
+- `export` brings edits made in the preview back into the files with the real entity ids, so `plan` shows them as changes to the real collection. Items are matched by path, then by content, so renames survive; an item both renamed and edited comes back as new.
+- Subscriptions are left out of previews, so nothing is sent.
+- `--create-owner` creates a missing Metabase user. A user who has never logged in has no personal collection yet, and preview stops.
+- `METABASE_PREVIEW_OWNER` and `METABASE_PREVIEW_NAME` can replace the flags.
+
+### SQL repo tags
+
+```bash
+mbs tag --repo sales            # first line of every native SQL card: -- mb:repo=sales card=<path>
+mbs tag --repo sales --check    # exit 2 if any card is missing it (for CI)
+```
+
+Warehouse query history then shows which repo and card ran each query. The tag is written into the files, so Metabase and git agree.
+
+### Taking upstream releases
+
+His code is untouched apart from one line in `pyproject.toml` (the `mbs` script) and this README section. `src/metabase_sync/ext/_seams.py` is the only place that reaches into his internals, and `tests/ext` fails if those change.
+
+```bash
+git fetch upstream --tags
+git rebase vX.Y.Z main
+uv sync
+uv run pytest tests/ext
+uv run pytest -m integration -n 0 tests/integration/test_ext_preview.py
+METABASE_VERSION=v0.64.2 uv run pytest -m integration -n 0 tests/integration/test_ext_preview.py
+git push --force-with-lease origin main
+git tag vX.Y.Z-ext.1 && git push origin vX.Y.Z-ext.1
+```
+
+# Upstream
 
 Metabase as code for the open-source edition. Export collections, questions, models, dashboards, snippets, and dashboard subscriptions to YAML in the [metabase/representations](https://github.com/metabase/representations) format, review changes in git, and apply them back with a Terraform-style `plan` and `apply`.
 
