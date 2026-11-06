@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from pydantic import AliasPath, BaseModel, Field
 
 from metabase_sync.format.representations.snippet import Snippet

@@ -1,5 +1,7 @@
 """The only places ext reaches into upstream internals. Upstream changes here should fail tests/ext."""
 
+from __future__ import annotations
+
 from collections.abc import Iterator
 from contextlib import contextmanager
 

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from difflib import get_close_matches
 from typing import TYPE_CHECKING, Any, get_args
 

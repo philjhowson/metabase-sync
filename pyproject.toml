@@ -1,12 +1,12 @@
 [project]
-name = "metabase-sync"
-version = "0.4.0"
+name = "sync-metabase"
+version = "1.0.0"
 description = "Metabase as code: export, plan, and apply collections, questions, dashboards, snippets, and subscriptions in the metabase/representations format, using the Metabase REST API."
 readme = { file = "README.md", content-type = "text/markdown" }
-authors = [{ name = "novucs" }]
+authors = [{ name = "Phil Howson" }, { name = "novucs (original metabase-sync)" }]
 license = "MIT"
 license-files = ["LICENSE"]
-requires-python = ">=3.15"
+requires-python = ">=3.12"
 keywords = ["metabase", "iac", "as-code", "dashboards", "cli", "gitops"]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -15,6 +15,9 @@ classifiers = [
     "Intended Audience :: System Administrators",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Programming Language :: Python :: 3.15",
     "Topic :: Database",
     "Topic :: Software Development :: Version Control",
@@ -32,10 +35,10 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/novucs/metabase-sync"
-Repository = "https://github.com/novucs/metabase-sync"
-Issues = "https://github.com/novucs/metabase-sync/issues"
-Changelog = "https://github.com/novucs/metabase-sync/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/philjhowson/sync-metabase"
+Repository = "https://github.com/philjhowson/sync-metabase"
+Issues = "https://github.com/philjhowson/sync-metabase/issues"
+Original = "https://github.com/novucs/metabase-sync"
 
 [project.scripts]
 metabase-sync = "metabase_sync.cli:main"

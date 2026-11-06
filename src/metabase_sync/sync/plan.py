@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from metabase_sync.errors import ValidationFailed
 from metabase_sync.format.representations import KINDS
 from metabase_sync.metabase.remote import Remote

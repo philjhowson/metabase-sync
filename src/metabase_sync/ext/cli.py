@@ -1,5 +1,7 @@
 """`mbs`: the upstream CLI plus `preview` and `tag`."""
 
+from __future__ import annotations
+
 from typing import Annotated
 
 import typer

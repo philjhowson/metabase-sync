@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from collections.abc import Iterator
 from graphlib import CycleError, TopologicalSorter
 from itertools import pairwise

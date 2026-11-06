@@ -2,14 +2,14 @@
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-A fork of [metabase-sync](https://github.com/novucs/metabase-sync) by [novucs](https://github.com/novucs). Everything below "Upstream" is his tool and his documentation; this fork adds branch previews and SQL repo tags in `src/metabase_sync/ext/`, and leaves his code untouched.
+Based on [metabase-sync](https://github.com/novucs/metabase-sync) by [novucs](https://github.com/novucs) (MIT). His work is the core of this project: the Terraform-style `plan`/`apply`, the [metabase/representations](https://github.com/metabase/representations) file format, and the documentation under "Core" below. This project is maintained separately and adds branch previews, SQL repo tags, and Python 3.12 support.
 
-## Fork additions
+## Additions
 
-Install from a tag of this repo; the CLI is `mbs`, which is `metabase-sync` plus the commands below:
+Install from a tag of this repo (Python 3.12+); the CLI is `mbs`, which is `metabase-sync` plus the commands below:
 
 ```bash
-uv tool install "git+https://github.com/philjhowson/sync-metabase@v0.4.0-ext.1"
+poetry add "git+https://github.com/philjhowson/sync-metabase.git#v1.0.0"
 ```
 
 ### Branch previews
@@ -38,22 +38,17 @@ mbs tag --repo sales --check    # exit 2 if any card is missing it (for CI)
 
 Warehouse query history then shows which repo and card ran each query. The tag is written into the files, so Metabase and git agree.
 
-### Taking upstream releases
-
-His code is untouched apart from one line in `pyproject.toml` (the `mbs` script) and this README section. `src/metabase_sync/ext/_seams.py` is the only place that reaches into his internals, and `tests/ext` fails if those change.
+### Testing
 
 ```bash
-git fetch upstream --tags
-git rebase vX.Y.Z main
-uv sync
-uv run pytest tests/ext
-uv run pytest -m integration -n 0 tests/integration/test_ext_preview.py
-METABASE_VERSION=v0.64.2 uv run pytest -m integration -n 0 tests/integration/test_ext_preview.py
-git push --force-with-lease origin main
-git tag vX.Y.Z-ext.1 && git push origin vX.Y.Z-ext.1
+uv run pytest --ignore=tests/integration --ignore=tests/contracts                  # unit, ~2 s
+uv run pytest -m integration -n 0 tests/integration                               # needs Docker
+METABASE_VERSION=v0.64.2 uv run pytest -m integration -n 0 tests/integration      # a specific Metabase
 ```
 
-# Upstream
+Run the integration tests before upgrading Metabase. Fixes from the original project can be cherry-picked from the `upstream` remote.
+
+# Core
 
 Metabase as code for the open-source edition. Export collections, questions, models, dashboards, snippets, and dashboard subscriptions to YAML in the [metabase/representations](https://github.com/metabase/representations) format, review changes in git, and apply them back with a Terraform-style `plan` and `apply`.
 

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from pathlib import Path
 
 from metabase_sync.ext import _seams, sqltag

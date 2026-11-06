@@ -1,6 +1,8 @@
 """First line of every native SQL card: `-- mb:repo=<repo> card=<path>`, so warehouse query
 history shows which repo and card ran a query. Written into the files, so Metabase matches git."""
 
+from __future__ import annotations
+
 import copy
 from pathlib import Path
 

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pytest
 
 from metabase_sync.ext import preview as pv
@@ -28,14 +30,20 @@ def test_preview_lives_in_the_owners_personal_collection_and_round_trips(
     again = pv.apply(client, root, owner, name)
     assert not [d for d in again if d[0] in ("create", "archive")]
 
+    cols = mb.get("/api/collection?exclude_other_user_collections=false")
+    inside = {top["id"]} | {
+        c["id"] for c in cols if f"/{top['id']}/" in str(c.get("location"))
+    }
     copy = next(
         c
         for c in mb.get("/api/card?f=all")
-        if c["name"] == rich.native["name"] and c["id"] != rich.native["id"]
+        if c["name"] == rich.native["name"] and c["collection_id"] in inside
     )
     mb.update_card(copy["id"], {"name": "Edited in preview"})
     pv.export(client, root, owner, name)
-    assert read_tree(root).entities[rich.native["entity_id"]].name == "Edited in preview"
+    assert (
+        read_tree(root).entities[rich.native["entity_id"]].name == "Edited in preview"
+    )
     assert mb.get_card(rich.native["id"])["name"] == rich.native["name"]
     ops = workflow.plan(client, root)[1].operations
     assert [(op.action, op.entity_id) for op in ops] == [

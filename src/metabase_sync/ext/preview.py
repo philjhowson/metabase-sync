@@ -3,6 +3,8 @@ that user and admins can see it. Metabase assigns its own entity ids on create, 
 matched to the files by path: previewing again updates them in place, and exporting a preview maps
 them back to the real ids. Nothing is written to the repo's state."""
 
+from __future__ import annotations
+
 import json
 import re
 import tempfile
