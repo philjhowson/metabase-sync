@@ -164,6 +164,24 @@ def test_items_never_seen_by_the_tool_are_left_alone():
     assert [u.entity_id for u in plan.unmanaged] == [eid("c")]
 
 
+def test_unmanaged_archive_archives_items_the_files_never_had_but_not_subscriptions():
+    index = remote(
+        collection=[collection(1, "a")],
+        card=[card(10, "c", 1)],
+        dashboard=[
+            {"id": 20, "entity_id": eid("d"), "name": "dash d", "collection_id": 1}
+        ],
+    )
+    local = local_from(index, [(COLLECTION, 1), (DASHBOARD, 20)], {eid("a"), eid("d")})
+
+    plan = build_plan(local, connected(index), unmanaged_items="archive")
+
+    assert [(op.action, op.entity_id) for op in plan.operations] == [
+        ("archive", eid("c"))
+    ]
+    assert plan.unmanaged == []
+
+
 def unmanaged_card_rewritten_as(index: Index, tag: str) -> LocalTree:
     local = local_from(index, [(COLLECTION, 1), (CARD, 10)], {eid("a")})
     local.entities[eid(tag)] = local.entities.pop(eid("c"))

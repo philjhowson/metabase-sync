@@ -31,3 +31,4 @@ state/
 .idea/
 *.swp
 .DS_Store
+.metabase-sync/

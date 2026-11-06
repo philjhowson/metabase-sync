@@ -63,6 +63,7 @@ class Config(BaseModel):
     collections: set[EntityId] | None = None
     snippets: bool | None = None
     removal: Literal["archive", "delete"] = ARCHIVE
+    unmanaged: Literal["keep", "archive"] = "keep"
 
     @property
     def manages_snippets(self) -> bool:
@@ -297,7 +298,12 @@ def plan(
     prepared = prepare(client, root, recover)
     config = prepared.config
     result = build_plan(
-        prepared.tree, prepared.remote, config.removal, config.collections, force
+        prepared.tree,
+        prepared.remote,
+        config.removal,
+        config.collections,
+        force,
+        config.unmanaged,
     )
     return prepared, result
 
@@ -429,7 +435,13 @@ def status(client: MetabaseClient, root: Path) -> Status:
     if result.interrupted or result.report.errors:
         return result
     remote = connect(client, config, local)
-    result.plan = build_plan(local, remote, config.removal, config.collections)
+    result.plan = build_plan(
+        local,
+        remote,
+        config.removal,
+        config.collections,
+        unmanaged_items=config.unmanaged,
+    )
     groups: dict[tuple[str, str, int | None], list[RemoteItem]] = {}
     for kind in KINDS:
         for item in remote.index.live(kind):

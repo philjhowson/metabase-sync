@@ -9,6 +9,8 @@ import typer
 from metabase_sync import cli as core
 from metabase_sync.ext import preview as pv
 from metabase_sync.ext import sqltag
+from metabase_sync.metabase.client import MetabaseClient
+from metabase_sync.settings import load_settings
 
 app = core.app
 preview = typer.Typer(
@@ -87,7 +89,9 @@ def preview_destroy(
     debug: core.Debug = False,
 ) -> None:
     root = core._start(root, verbose, debug)
-    with core._client(root) as client:
+    with MetabaseClient(
+        load_settings(root)
+    ) as client:  # no files needed: CI runs it after the branch is gone
         gone = pv.destroy(client, name, owner)
     core.out.print(f"Archived {len(gone)} preview(s) named {name!r}.", markup=False)
 

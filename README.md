@@ -2,14 +2,14 @@
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-Based on [metabase-sync](https://github.com/novucs/metabase-sync) by [novucs](https://github.com/novucs) (MIT). His work is the core of this project: the Terraform-style `plan`/`apply`, the [metabase/representations](https://github.com/metabase/representations) file format, and the documentation under "Core" below. This project is maintained separately and adds branch previews, SQL repo tags, and Python 3.12 support.
+Based on [metabase-sync](https://github.com/novucs/metabase-sync) by [novucs](https://github.com/novucs) (MIT). His work is the core of this project: the Terraform-style `plan`/`apply`, the [metabase/representations](https://github.com/metabase/representations) file format, and the documentation under "Core" below. This project is maintained separately and adds branch previews, SQL repo tags, `unmanaged: archive`, and Python 3.12 support.
 
 ## Additions
 
 Install from a tag of this repo (Python 3.12+); the CLI is `mbs`, which is `metabase-sync` plus the commands below:
 
 ```bash
-poetry add "git+https://github.com/philjhowson/sync-metabase.git#v1.0.0"
+uv add "sync-metabase @ git+https://github.com/philjhowson/sync-metabase@v1.1.0"
 ```
 
 ### Branch previews
@@ -28,6 +28,15 @@ mbs preview destroy --name "🚧 sales @ my-branch"                             
 - Subscriptions are left out of previews, so nothing is sent.
 - `--create-owner` creates a missing Metabase user. A user who has never logged in has no personal collection yet, and preview stops.
 - `METABASE_PREVIEW_OWNER` and `METABASE_PREVIEW_NAME` can replace the flags.
+
+### Archiving items the files never had
+
+```yaml
+# metabase-sync.yaml
+unmanaged: archive   # default: keep
+```
+
+For collections where git is the only way in (the Metabase UI is view-only): `plan` and `apply` also archive items in the managed collections that no file and no `metabase-sync.state` entry knows about, such as ones created in the UI. Subscriptions are never archived this way, since viewers create their own.
 
 ### SQL repo tags
 
